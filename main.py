@@ -3,7 +3,8 @@
 
 Writes one fortune-cookie line an AI agent would crack open to
 /output/entry.txt. The line is a fixed constant: the program's whole
-job is to deliver it byte-exact, inside the 1-200 character gate.
+job is to deliver it byte-exact, inside the 1-200 character gate, and
+to prove it by reading the file back after writing it.
 """
 
 import os
@@ -22,6 +23,10 @@ def main() -> None:
     os.makedirs("/output", exist_ok=True)
     with open("/output/entry.txt", "w", encoding="utf-8") as fh:
         fh.write(FORTUNE)
+    # Read back what landed on disk and refuse a silent mismatch.
+    with open("/output/entry.txt", "r", encoding="utf-8") as fh:
+        if fh.read() != FORTUNE:
+            raise SystemExit("read-back mismatch: /output/entry.txt differs from FORTUNE")
 
 
 if __name__ == "__main__":
